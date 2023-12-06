@@ -5,17 +5,18 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 from django.utils import timezone
+from django.db.models.signals import post_save
 
 # Create your models here.
 class UserProfile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
-    address=models.CharField(max_length=200)
-    phone=models.CharField(max_length=200)
+    address=models.CharField(max_length=200,null=True)
+    phone=models.CharField(max_length=200,null=True)
     profile_pic=models.ImageField(upload_to="profilepics",null=True,blank=True)
-    dob=models.DateField()
-    bio=models.CharField(max_length=200)
-    following=models.ManyToManyField("self",related_name="followed_by",symmetrical=False)
-    block=models.ManyToManyField("self",related_name="blocked",symmetrical=False)
+    dob=models.DateField(null=True)
+    bio=models.CharField(max_length=200,null=True)
+    following=models.ManyToManyField("self",related_name="followed_by",symmetrical=False,null=True)
+    block=models.ManyToManyField("self",related_name="blocked",symmetrical=False, null=True)
 
 
     def __str__(self):
@@ -47,9 +48,19 @@ class Stories(models.Model):
     title=models.CharField(max_length=200)
     post_image=models.ImageField(upload_to="stories",null=True,blank=True)
     created_date=models.DateTimeField(auto_now_add=True)
-    exp=created_date + timezone.timedelta(days=1)
-    expiry_date=models.DateTimeField(exp)
+    #exp=created_date + timezone.timedelta(days=1)
+    expiry_date=models.DateTimeField()
     
 
     def __str__(self):
         return self.title
+    
+   # def save(self,*args,**kwargs):
+        #if not self.expiry_date:
+            #self.expiry_date=self.created_date+timezone.timedelta(days=1)
+            #super().save(*args,**kwargs)
+def CreateProfile(sender,created,instance,**kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
+post_save.connect(CreateProfile,sender=User)            
+
