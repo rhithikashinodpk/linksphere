@@ -45,7 +45,7 @@ class Comments(models.Model):
 
 class Stories(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="userstories")
-    title=models.CharField(max_length=200)
+    title=models.CharField(max_length=200,null=True)
     post_image=models.ImageField(upload_to="stories",null=True,blank=True)
     created_date=models.DateTimeField(auto_now_add=True)
     #exp=created_date + timezone.timedelta(days=1)

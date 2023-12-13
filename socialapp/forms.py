@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from socialapp.models import UserProfile,Posts
 
 class RegirstrationForms(UserCreationForm):
     class Meta:
@@ -9,5 +10,20 @@ class RegirstrationForms(UserCreationForm):
 
 class LoginForm(forms.Form):
     username=forms.CharField()
-    password=forms.CharField()        
+    password=forms.CharField()  
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model=UserProfile
+        exclude=('user','following','block')   
+        widgets={
+            "dob":forms.DateInput(attrs={"class":"form-control","type":"date"})
+        } 
+
+class PostForm(forms.ModelForm):
+
+    class Meta:
+        model=Posts
+        fields=["title","post_image"]        
+
 
